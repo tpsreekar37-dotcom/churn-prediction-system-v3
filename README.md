@@ -105,6 +105,12 @@ git push -u origin main
 `dashboard/app.py`, Python **3.12**. It installs `requirements.txt` and gives you
 a `*.streamlit.app` URL.
 
+> **Python 3.12 is required, and it must be chosen *before* deploying.** The
+> pickles need scikit-learn 1.3.2, and the pinned dependencies have no wheels
+> above 3.12 — on 3.13/3.14 the build fails while compiling `pillow` / `pandas`.
+> Community Cloud cannot change an app's Python version in place: delete the app
+> and redeploy with **Advanced settings → Python version: 3.12**.
+
 **Render** works too and uses the included `render.yaml`:
 **New + → Blueprint →** pick the repo → **Apply**. Render sets the Python
 version, build command, start command and health check for you (free plan:

@@ -20,6 +20,7 @@ Two free paths, both no-credit-card:
 | `render.yaml` | Render Blueprint: Python 3.12.5, build + start command, health check, auto-deploy |
 | `Procfile` | Same start command, for Railway / Heroku / any process manager |
 | `.python-version` | Pins Python 3.12 (the version that produced the model pickles) |
+| `runtime.txt` | Same pin for hosts that read Heroku-style `runtime.txt` |
 | `requirements.txt` | All runtime dependencies, pinned |
 | `.streamlit/config.toml` | `headless = true`, 200 MB upload cap, file watcher off |
 | `.gitignore` | Ignores secrets and the SQLite DB — **keeps** `models/*.pkl` |
@@ -30,6 +31,22 @@ to run `streamlit run dashboard/app.py`.
 ---
 
 ## 2. Streamlit Community Cloud (free, no card) — recommended
+
+> ### ⚠️ Python 3.12 is mandatory — set it in Advanced settings
+>
+> The saved models were pickled with **Python 3.12.5 + scikit-learn 1.3.2**, and
+> the pinned dependencies only publish prebuilt wheels **up to Python 3.12**. On
+> 3.13/3.14 the build compiles `pandas`, `numpy`, `scipy` and `pillow` from
+> source and fails with `Failed to build pillow` / `metadata-generation-failed`.
+>
+> Community Cloud defaults to the newest Python it supports, so **you must open
+> Advanced settings and choose 3.12 before clicking Deploy.** If the app is
+> already deployed on another version, the version cannot be changed in place —
+> **delete the app and redeploy it** with 3.12 selected (the custom subdomain is
+> released immediately and can be reused).
+>
+> The app also checks this at startup: on a wrong interpreter it shows the fix
+> instead of a traceback.
 
 This is the native home for a Streamlit app: it clones the repo, installs
 `requirements.txt`, runs the app and gives you a public `*.streamlit.app` URL.
@@ -48,7 +65,7 @@ It also redeploys automatically on every push.
    | App URL | pick something like `churn-prediction-system` |
 
 4. Open **Advanced settings → Python version** and select **3.12** (matches the
-   pickles in `models/`).
+   pickles in `models/`). **This is the step that must not be skipped.**
 5. Click **Deploy**. The first build takes 3–6 minutes: it clones ~130 MB
    (the model artefacts) and installs the pinned dependencies.
 6. Your app appears at `https://<app-url>.streamlit.app`.
@@ -135,7 +152,7 @@ git push -u origin main
 
 Confirm on github.com that these arrived:
 
-- `render.yaml`, `Procfile`, `.python-version`
+- `render.yaml`, `Procfile`, `.python-version`, `runtime.txt`
 - `models/best_model.pkl` (~80 MB), `models/voting_ensemble.pkl` (~14 MB),
   `models/model_results.json`
 - `data/raw/telco_churn_raw.csv`
@@ -153,10 +170,38 @@ git push
 
 ## 5. Troubleshooting
 
-**Build fails on a dependency**
-The pins are a tested set (pandas 2.1.4, scikit-learn 1.3.2, xgboost 2.0.3,
-streamlit 1.29.0). On Render, make sure `PYTHON_VERSION=3.12.5` is set on the
-service; on Streamlit Cloud, pick Python 3.12 in Advanced settings.
+**Build fails on a dependency / `Failed to build pillow` / `metadata-generation-failed`**
+The host is not on Python 3.12. The log gives it away:
+
+```
+Using Python 3.14.10 environment at: /home/adminuser/venv
+...
+error: Failed to build `pillow==10.4.0`
+RequiredDependencyException: zlib
+...
+Collecting pandas==2.1.4 ... error: metadata-generation-failed
+```
+
+Those packages only ship wheels for Python ≤ 3.12, so on 3.13/3.14 `pip`/`uv`
+tries to compile them from source and has no compiler headers. Every pin in
+`requirements.txt` resolves to a prebuilt Linux wheel on cp312, so:
+
+- **Streamlit Cloud:** the Python version is fixed at deploy time. Open the app
+  menu (⋮) → **Delete app**, deploy the repo again, and in **Advanced settings**
+  choose **Python version 3.12**. Then Deploy. Re-use the same subdomain.
+- **Render:** set `PYTHON_VERSION=3.12.5` on the service (the Blueprint already
+  does this).
+- **Railway / Heroku:** `runtime.txt` pins `python-3.12.5`; make sure it is
+  committed.
+
+The pins are a tested set (pandas 2.1.4, numpy 1.26.2, scipy 1.11.4,
+scikit-learn 1.3.2, xgboost 2.0.3, streamlit 1.29.0). Do not loosen them to
+"make it install" on a newer Python — scikit-learn 1.3.2 is required to
+unpickle `models/*.pkl`.
+
+**`Unsupported runtime — the app cannot load its models`**
+Working as intended: the app detected a Python/scikit-learn version mismatch and
+stopped with the fix. Same solution — redeploy on Python 3.12.
 
 **`FileNotFoundError: models/...` in the logs**
 The pickles were not committed — see §4.

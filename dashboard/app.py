@@ -59,6 +59,54 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
+# RUNTIME GUARD — the model artefacts require Python 3.12 + scikit-learn 1.3.2
+# ─────────────────────────────────────────────────────────────────────────────
+
+REQUIRED_PYTHON = (3, 12)
+REQUIRED_SKLEARN = "1.3.2"
+
+
+def _runtime_guard() -> None:
+    """Stop with an actionable message on an unsupported interpreter.
+
+    models/*.pkl were pickled with Python 3.12.5 and scikit-learn 1.3.2, and
+    the pinned dependencies only publish prebuilt wheels up to Python 3.12.
+    On anything newer the build itself fails (pandas/scipy compile from source
+    and die), so surfacing the fix here beats an obscure traceback later.
+    """
+    import sklearn  # imported here so the check never hides an install error
+
+    problems = []
+    if sys.version_info[:2] != REQUIRED_PYTHON:
+        problems.append(
+            f"Python {sys.version_info.major}.{sys.version_info.minor} detected; "
+            f"this project requires Python {REQUIRED_PYTHON[0]}.{REQUIRED_PYTHON[1]}."
+        )
+    if sklearn.__version__ != REQUIRED_SKLEARN:
+        problems.append(
+            f"scikit-learn {sklearn.__version__} detected; the saved models were "
+            f"trained with {REQUIRED_SKLEARN}."
+        )
+
+    if problems:
+        st.error(
+            "**Unsupported runtime — the app cannot load its models.**\n\n"
+            + "\n".join(f"- {p}" for p in problems)
+            + "\n\n**Fix on Streamlit Community Cloud:** open the app menu (⋮) → "
+            "**Delete app**, then redeploy the same repo with "
+            "**Advanced settings → Python version: 3.12**. The version cannot be "
+            "changed after deployment, so it has to be recreated.\n\n"
+            "**Fix locally:** install Python 3.12 and run "
+            "`pip install -r requirements.txt` in a fresh virtual environment.\n\n"
+            "See `DEPLOY.md` §5 if the build log mentions "
+            "`Failed to build pillow` or `pandas`."
+        )
+        st.stop()
+
+
+_runtime_guard()
+
+# ─────────────────────────────────────────────────────────────────────────────
 # FILE READER — strips Excel phantom rows/columns immediately on load
 # ─────────────────────────────────────────────────────────────────────────────
 
