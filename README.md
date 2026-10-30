@@ -101,7 +101,7 @@ git push -u origin main
 
 **Streamlit Community Cloud** is the easiest free option (no card, 1 GB RAM):
 <https://share.streamlit.io> → **Create app** → repo
-`tpsreekar37-dotcom/churn-prediction-system-v2`, branch `main`, main file
+`tpsreekar37-dotcom/churn-prediction-system-v3`, branch `main`, main file
 `dashboard/app.py`, Python **3.12**. It installs `requirements.txt` and gives you
 a `*.streamlit.app` URL.
 

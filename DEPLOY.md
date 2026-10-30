@@ -42,7 +42,7 @@ It also redeploys automatically on every push.
 
    | Field | Value |
    |---|---|
-   | Repository | `tpsreekar37-dotcom/churn-prediction-system-v2` |
+   | Repository | `tpsreekar37-dotcom/churn-prediction-system-v3` |
    | Branch | `main` |
    | Main file path | `dashboard/app.py` |
    | App URL | pick something like `churn-prediction-system` |
@@ -75,7 +75,7 @@ handles all of that.
 ### Option A — Blueprint (uses `render.yaml`)
 
 1. <https://dashboard.render.com> → **New +** → **Blueprint**.
-2. Connect GitHub and pick `churn-prediction-system-v2`.
+2. Connect GitHub and pick `churn-prediction-system-v3`.
 3. Render reads `render.yaml` and shows one web service,
    `churn-prediction-system`, on the **Free** plan.
 4. Click **Apply**, wait for `Your service is live`, open the service URL.
