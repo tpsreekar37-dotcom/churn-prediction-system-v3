@@ -1,0 +1,6 @@
+{
+  "cv_auc_mean": 0.8439,
+  "cv_auc_std": 0.008,
+  "cv_rows": 5616,
+  "cv_on_smote_data": false
+}

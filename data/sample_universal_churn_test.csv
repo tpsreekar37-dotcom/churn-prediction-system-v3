@@ -1,0 +1,41 @@
+customer_id,tenure_months,plan_type,monthly_spend,support_plan,payment_method,churned
+C001,2,Monthly,89.50,No,Electronic check,Yes
+C002,4,Monthly,75.20,No,Electronic check,Yes
+C003,7,Monthly,92.10,No,Mailed check,Yes
+C004,10,Monthly,68.40,No,Electronic check,Yes
+C005,3,Monthly,84.90,Yes,Electronic check,Yes
+C006,15,Monthly,79.30,No,Mailed check,Yes
+C007,8,Monthly,96.80,No,Electronic check,Yes
+C008,11,Monthly,72.60,No,Bank transfer,Yes
+C009,5,Monthly,88.00,No,Electronic check,Yes
+C010,18,Monthly,81.70,No,Mailed check,Yes
+C011,6,Monthly,67.50,No,Electronic check,Yes
+C012,9,Monthly,91.20,Yes,Electronic check,Yes
+C013,1,Monthly,76.40,No,Credit card,Yes
+C014,14,Monthly,85.60,No,Electronic check,Yes
+C015,12,Monthly,70.30,No,Mailed check,Yes
+C016,20,Monthly,93.10,No,Electronic check,Yes
+C017,16,Monthly,74.80,No,Bank transfer,Yes
+C018,22,Monthly,86.90,Yes,Electronic check,Yes
+C019,19,Monthly,78.20,No,Mailed check,Yes
+C020,13,Monthly,90.40,No,Electronic check,Yes
+C021,32,Annual,54.30,Yes,Bank transfer,No
+C022,45,Two year,49.90,Yes,Credit card,No
+C023,27,Annual,61.20,Yes,Bank transfer,No
+C024,58,Two year,45.80,Yes,Credit card,No
+C025,39,Annual,57.60,Yes,Bank transfer,No
+C026,64,Two year,51.40,Yes,Credit card,No
+C027,31,Annual,59.80,Yes,Mailed check,No
+C028,52,Two year,48.70,Yes,Bank transfer,No
+C029,36,Annual,63.10,Yes,Credit card,No
+C030,71,Two year,46.20,Yes,Bank transfer,No
+C031,29,Annual,55.90,Yes,Credit card,No
+C032,48,Two year,53.70,Yes,Bank transfer,No
+C033,34,Annual,60.40,Yes,Mailed check,No
+C034,67,Two year,47.50,Yes,Credit card,No
+C035,41,Annual,58.20,Yes,Bank transfer,No
+C036,55,Two year,50.60,Yes,Credit card,No
+C037,25,Annual,64.80,Yes,Bank transfer,No
+C038,62,Two year,44.90,Yes,Mailed check,No
+C039,38,Annual,56.70,Yes,Credit card,No
+C040,70,Two year,52.30,Yes,Bank transfer,No

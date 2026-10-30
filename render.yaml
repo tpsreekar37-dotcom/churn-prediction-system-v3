@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: churn-prediction-system
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.fileWatcherType none --browser.gatherUsageStats false
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.5
+      - key: PYTHONUNBUFFERED
+        value: "1"

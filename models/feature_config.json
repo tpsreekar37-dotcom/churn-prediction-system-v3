@@ -1,0 +1,17 @@
+{
+  "monthly_charge_threshold": 89.85,
+  "monthly_charge_min": 19.2,
+  "monthly_charge_max": 114.64250000000003,
+  "tenure_min": 0.0,
+  "tenure_max": 72.0,
+  "outlier_bounds": {
+    "MonthlyCharges": [
+      19.2,
+      114.64250000000003
+    ],
+    "TotalCharges": [
+      19.8575,
+      8030.625000000006
+    ]
+  }
+}

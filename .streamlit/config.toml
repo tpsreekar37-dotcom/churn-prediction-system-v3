@@ -1,0 +1,26 @@
+[theme]
+base = "light"
+primaryColor = "#C59B27"
+backgroundColor = "#FAFAF7"
+secondaryBackgroundColor = "#F4F4EE"
+textColor = "#000000"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+
+# ── Server settings used when hosting (Railway / Render / Docker) ─────────────
+# The port is NOT set here: hosts inject it through $PORT and the start command
+# in the Procfile passes it to Streamlit.
+[server]
+headless = true
+maxUploadSize = 200
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+# If a host's reverse proxy breaks the websocket connection (the page loads but
+# stays on "RUNNING..."), uncomment these two lines and redeploy:
+# enableCORS = false
+# enableXsrfProtection = false

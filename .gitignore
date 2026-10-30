@@ -1,0 +1,34 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.streamlit/secrets.toml
+.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ── Generated database & runtime artifacts ────────────────────────────────────
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# ── Trained model binaries ────────────────────────────────────────────────────
+# These ARE committed on purpose. The deployed app loads models/best_model.pkl at
+# startup and does not retrain on the server, so the repo must contain them.
+# They can be regenerated at any time with `python main.py`.
+# (models/best_model.pkl is ~80 MB — under GitHub's 100 MB per-file limit.)
+
+# ── Editor / OS noise ─────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# ── Local scratch / archived deliverables ─────────────────────────────────────
+_archive/

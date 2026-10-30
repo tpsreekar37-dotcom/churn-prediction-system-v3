@@ -1,0 +1,55 @@
+========================================================================
+   BUSINESS ANALYTICS SYSTEM: CUSTOMER CHURN PREDICTION
+========================================================================
+
+STEP 1: Open Command Prompt / Terminal in the project folder:
+        cd churn_predicting
+
+STEP 2: Install required Python dependencies:
+        pip install -r requirements.txt
+
+STEP 3: Run the Streamlit Dashboard:
+        streamlit run dashboard/app.py
+
+STEP 4: Open your web browser at:
+        http://localhost:8501
+
+------------------------------------------------------------------------
+OPTIONAL: rebuild models, figures and the analytics database
+------------------------------------------------------------------------
+        python main.py
+
+------------------------------------------------------------------------
+REQUIREMENTS
+------------------------------------------------------------------------
+- Python 3.10 - 3.12
+- Internet connection (for dashboard fonts and icons)
+- Libraries: streamlit, pandas, scikit-learn, xgboost, plotly, openpyxl
+
+------------------------------------------------------------------------
+GOOD TO KNOW
+------------------------------------------------------------------------
+- One decision threshold (0.50) is used everywhere, so a model's accuracy,
+  precision, recall, F1 and ROC-AUC are identical on every dashboard page
+  and in every session.
+- "Revenue at risk" uses the first money column it finds (MonthlyCharges,
+  charges, balance, amount, ltv, ...). Monthly columns are annualised;
+  stock columns such as a bank account balance are not. If no money column
+  exists the app shows N/A instead of inventing a figure.
+- Uploading a non-Telco dataset (for example a bank churn CSV) trains a
+  separate pipeline on that file; the numbers shown for it are that file's
+  own held-out results.
+
+------------------------------------------------------------------------
+HOSTING IT ONLINE (Render)
+------------------------------------------------------------------------
+1. Push the project to GitHub (all files, including models/).
+2. On https://dashboard.render.com: New + > Blueprint > pick the repo > Apply.
+   render.yaml sets the Python version, build command, start command and
+   health check for you.
+3. Open the service URL when the build finishes (3-6 minutes).
+
+Full instructions, free-plan limits and troubleshooting: DEPLOY.md
+
+For detailed documentation, read USER_MANUAL.md or README.md
+========================================================================
