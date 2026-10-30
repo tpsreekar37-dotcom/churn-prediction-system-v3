@@ -1,11 +1,15 @@
-# Deployment Guide — Hosting on Render
+# Deployment Guide — Free Hosting
 
-This project ships ready to deploy. Nothing is trained or built on the server:
+The project ships ready to deploy. Nothing is trained or built on the server:
 `models/` contains the trained artefacts, so the app starts scoring as soon as
-the container boots.
+the container boots. There are **no API keys and no secrets** to configure.
 
-Two options below: **Blueprint** (recommended, uses `render.yaml`) and
-**Manual** (if you prefer clicking through the dashboard).
+Two free paths, both no-credit-card:
+
+| Host | RAM | Sleeps when idle | Setup |
+|---|---|---|---|
+| **Streamlit Community Cloud** (recommended) | 1 GB | yes | 2 minutes, click-through |
+| **Render** (Blueprint) | 512 MB | yes (after 15 min) | 5 minutes, uses `render.yaml` |
 
 ---
 
@@ -13,69 +17,76 @@ Two options below: **Blueprint** (recommended, uses `render.yaml`) and
 
 | File | Purpose |
 |---|---|
-| `render.yaml` | Render Blueprint: Python 3.12.5, build + start command, health check, auto-deploy on push |
+| `render.yaml` | Render Blueprint: Python 3.12.5, build + start command, health check, auto-deploy |
 | `Procfile` | Same start command, for Railway / Heroku / any process manager |
 | `.python-version` | Pins Python 3.12 (the version that produced the model pickles) |
 | `requirements.txt` | All runtime dependencies, pinned |
 | `.streamlit/config.toml` | `headless = true`, 200 MB upload cap, file watcher off |
 | `.gitignore` | Ignores secrets and the SQLite DB — **keeps** `models/*.pkl` |
 
-The app listens on `$PORT` and `0.0.0.0`, which is what Render requires.
+The app never reads `st.secrets` or environment variables, so a host only needs
+to run `streamlit run dashboard/app.py`.
 
 ---
 
-## 2. Option A — Blueprint deploy (recommended)
+## 2. Streamlit Community Cloud (free, no card) — recommended
 
-1. Push this project to GitHub (see §3 if you have not done that yet).
-2. Go to <https://dashboard.render.com> → **New +** → **Blueprint**.
-3. Connect your GitHub account and pick the repository.
-4. Render reads `render.yaml` and shows one web service,
+This is the native home for a Streamlit app: it clones the repo, installs
+`requirements.txt`, runs the app and gives you a public `*.streamlit.app` URL.
+It also redeploys automatically on every push.
+
+1. Sign in at <https://share.streamlit.io> with the GitHub account that owns the
+   repo (`tpsreekar37-dotcom`).
+2. Click **Create app** (or **New app**).
+3. Choose **Deploy a public app from GitHub** and fill in:
+
+   | Field | Value |
+   |---|---|
+   | Repository | `tpsreekar37-dotcom/churn-prediction-system-v2` |
+   | Branch | `main` |
+   | Main file path | `dashboard/app.py` |
+   | App URL | pick something like `churn-prediction-system` |
+
+4. Open **Advanced settings → Python version** and select **3.12** (matches the
+   pickles in `models/`).
+5. Click **Deploy**. The first build takes 3–6 minutes: it clones ~130 MB
+   (the model artefacts) and installs the pinned dependencies.
+6. Your app appears at `https://<app-url>.streamlit.app`.
+
+No secrets to add, no start command to type, no port to set — Streamlit Cloud
+handles all of that.
+
+### Notes for this app
+
+- **1 GB RAM.** The dashboard itself loads one 14 MB model and runs fine. The
+  *Model Comparison & Evaluation* page trains five models on the uploaded file
+  and is the heaviest page; on a very large CSV it can hit the limit.
+- **Sleeps when idle.** The first visit after a long pause takes 30–60 s to
+  wake. Open the URL a minute before a demo.
+- **Ephemeral disk.** `data/churn.db` is recreated on each restart; nothing
+  user-facing depends on it.
+- **Redeploys on push** to `main`, and the app's own menu (⋮ → **Reboot app**)
+  restarts it if needed.
+
+---
+
+## 3. Render (free, no card)
+
+### Option A — Blueprint (uses `render.yaml`)
+
+1. <https://dashboard.render.com> → **New +** → **Blueprint**.
+2. Connect GitHub and pick `churn-prediction-system-v2`.
+3. Render reads `render.yaml` and shows one web service,
    `churn-prediction-system`, on the **Free** plan.
-5. Click **Apply**. The build takes roughly 3–6 minutes (the model artefacts
-   are ~107 MB).
-6. When the log shows `You can now view your Streamlit app in your browser`,
-   open the service URL: `https://churn-prediction-system-xxxx.onrender.com`.
+4. Click **Apply**, wait for `Your service is live`, open the service URL.
 
-No environment variables need to be typed in — `render.yaml` sets
-`PYTHON_VERSION=3.12.5` for you.
+`render.yaml` already sets `PYTHON_VERSION=3.12.5`, the build command, the start
+command, the health check path and `autoDeploy: true`.
 
-## 3. Push the project to GitHub
+### Option B — Manual
 
-From the project folder (the one containing `dashboard/`, `src/`, `models/`):
-
-```cmd
-git init
-git add .
-git commit -m "Churn prediction dashboard"
-git branch -M main
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
-```
-
-Confirm on github.com that these arrived:
-
-- `render.yaml`
-- `Procfile`
-- `.python-version`
-- `models/best_model.pkl` (~80 MB)
-- `models/voting_ensemble.pkl` (~14 MB)
-- `models/model_results.json`
-- `data/raw/telco_churn_raw.csv`
-
-If `models/*.pkl` is missing, an old `.gitignore` is excluding them. Restore the
-one that ships with this project, or force-add:
-
-```cmd
-git add -f models/*.pkl
-git commit -m "Add trained models"
-git push
-```
-
-## 4. Option B — Manual deploy
-
-1. <https://dashboard.render.com> → **New +** → **Web Service**.
-2. Connect the repository.
-3. Settings:
+1. **New +** → **Web Service** → pick the repository.
+2. Settings:
 
    | Field | Value |
    |---|---|
@@ -83,15 +94,12 @@ git push
    | Build Command | `pip install --upgrade pip && pip install -r requirements.txt` |
    | Start Command | `streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.fileWatcherType none` |
    | Health Check Path | `/_stcore/health` |
-   | Instance Type | Free (or Starter, see §6) |
+   | Instance Type | Free |
 
-4. **Advanced → Add Environment Variable**:
-   `PYTHON_VERSION` = `3.12.5`
-5. **Create Web Service**.
+3. **Advanced → Add Environment Variable**: `PYTHON_VERSION` = `3.12.5`.
+4. **Create Web Service**.
 
----
-
-## 5. Expected build log
+### Expected build log
 
 ```
 ==> Installing Python version 3.12.5
@@ -104,42 +112,67 @@ Successfully installed pandas-2.1.4 scikit-learn-1.3.2 streamlit-1.29.0 ...
 ==> Your service is live 🎉
 ```
 
----
-
-## 6. Free plan limits (read this before your demo)
+### Render free-plan limits
 
 | Limit | Effect on this app |
 |---|---|
-| **512 MB RAM** | Dashboard startup is fine (it loads one 14 MB model). The **Model Comparison & Evaluation** page trains five new models on upload and can hit the ceiling on a large CSV. |
-| **Spins down after 15 min idle** | The first visit after a pause takes 30–60 s to wake. Open the URL a minute before a demo or viva. |
-| **Ephemeral disk** | `data/churn.db` is recreated on every deploy/restart. Nothing user-facing depends on it. |
-
-If you need the training page to be fast during a live demo, use the
-**Starter** plan (2 GB) for that session, then downgrade.
+| **512 MB RAM** | Startup is fine; the training page is the risk (see §2 notes). |
+| **Sleeps after 15 min idle** | First visit takes 30–60 s to wake. |
+| **Ephemeral disk** | `data/churn.db` resets on deploy/restart. |
 
 ---
 
-## 7. Troubleshooting
+## 4. Pushing the project to GitHub (if you ever start over)
+
+```cmd
+git init
+git add .
+git commit -m "Churn prediction dashboard"
+git branch -M main
+git remote add origin https://github.com/<your-user>/<your-repo>.git
+git push -u origin main
+```
+
+Confirm on github.com that these arrived:
+
+- `render.yaml`, `Procfile`, `.python-version`
+- `models/best_model.pkl` (~80 MB), `models/voting_ensemble.pkl` (~14 MB),
+  `models/model_results.json`
+- `data/raw/telco_churn_raw.csv`
+
+If `models/*.pkl` is missing, an old `.gitignore` is excluding them. Restore the
+one that ships with this project, or force-add:
+
+```cmd
+git add -f models/*.pkl
+git commit -m "Add trained models"
+git push
+```
+
+---
+
+## 5. Troubleshooting
 
 **Build fails on a dependency**
 The pins are a tested set (pandas 2.1.4, scikit-learn 1.3.2, xgboost 2.0.3,
-streamlit 1.29.0). If `PYTHON_VERSION` is ignored, make sure the env var is set
-on the service, not just in `render.yaml`.
+streamlit 1.29.0). On Render, make sure `PYTHON_VERSION=3.12.5` is set on the
+service; on Streamlit Cloud, pick Python 3.12 in Advanced settings.
 
 **`FileNotFoundError: models/...` in the logs**
-The pickles were not committed. See §3 (`git add -f models/*.pkl`).
+The pickles were not committed — see §4.
 
 **Page loads but stays on "RUNNING…"**
-Render's proxy can block the Streamlit websocket. Uncomment the last two lines
-of `.streamlit/config.toml` (`enableCORS`, `enableXsrfProtection`) and redeploy.
+The host's proxy is blocking the Streamlit websocket. Uncomment the last two
+lines of `.streamlit/config.toml` (`enableCORS`, `enableXsrfProtection`) and
+redeploy.
 
-**Deploy succeeds but the service is marked unhealthy**
+**Render: service marked unhealthy / "no open ports detected"**
 Check the health path is `/_stcore/health` and that the start command contains
-`--server.port $PORT`.
+`--server.port $PORT --server.address 0.0.0.0`.
 
-**Uploads fail**
-The upload cap is 200 MB (`maxUploadSize`). A 10,000-row CSV needs well under
-1 GB of RAM, but see the memory note in §6.
+**Render: `Killed` or the app dies on the training page**
+Out of memory on the 512 MB free plan. Use the Streamlit Cloud path (1 GB) or a
+paid instance for the demo.
 
 **Numbers differ between pages**
 They should not. Every page reads the canonical table in
@@ -147,7 +180,7 @@ They should not. Every page reads the canonical table in
 
 ---
 
-## 8. Updating the deployed app
+## 6. Updating the deployed app
 
 ```cmd
 git add -A
@@ -155,16 +188,17 @@ git commit -m "what changed"
 git push
 ```
 
-`autoDeploy: true` in `render.yaml` rebuilds the service on every push to
-`main`. No manual redeploy needed.
+Both hosts redeploy automatically on a push to `main`.
 
 ---
 
-## 9. Alternative hosts
+## 7. Other hosts
 
-- **Railway** — `Procfile` is already included; Railway injects `$PORT` the same
-  way. Build command: `pip install -r requirements.txt`.
-- **Heroku** — `Procfile` works, but the 512 MB free tier is tight; add
-  `runtime.txt` with `python-3.12.5` if the build picks the wrong version.
+- **Hugging Face Spaces** — free CPU tier with 16 GB RAM, no card. Requires a
+  `README.md` at the repo root whose YAML header sets `sdk: streamlit` and
+  `app_file: dashboard/app.py`; use a dedicated repo for it so this README stays
+  untouched.
+- **Railway** — `Procfile` is included; Railway injects `$PORT` the same way.
+  Free credit is limited, so it is not a long-term free option.
 - **Docker** — any `python:3.12-slim` image works:
   `CMD streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`

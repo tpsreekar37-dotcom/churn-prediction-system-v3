@@ -41,14 +41,21 @@ GOOD TO KNOW
   own held-out results.
 
 ------------------------------------------------------------------------
-HOSTING IT ONLINE (Render)
+HOSTING IT ONLINE (FREE)
 ------------------------------------------------------------------------
+Option 1 (easiest, no credit card):
 1. Push the project to GitHub (all files, including models/).
+2. Go to https://share.streamlit.io and sign in with GitHub.
+3. Create app > pick the repo, branch main, main file path dashboard/app.py,
+   Python 3.12 > Deploy. You get a https://<name>.streamlit.app URL.
+
+Option 2 (Render, uses the included render.yaml):
+1. Push the project to GitHub.
 2. On https://dashboard.render.com: New + > Blueprint > pick the repo > Apply.
    render.yaml sets the Python version, build command, start command and
    health check for you.
-3. Open the service URL when the build finishes (3-6 minutes).
 
+Both hosts sleep when idle, so the first visit after a pause takes 30-60 s.
 Full instructions, free-plan limits and troubleshooting: DEPLOY.md
 
 For detailed documentation, read USER_MANUAL.md or README.md

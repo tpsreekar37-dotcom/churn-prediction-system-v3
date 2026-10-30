@@ -97,22 +97,18 @@ git remote add origin https://github.com/<you>/<repo>.git
 git push -u origin main
 ```
 
-### Render
+### Free hosting
 
-**New + → Blueprint →** pick the repo → **Apply**. Render reads `render.yaml`,
-installs `requirements.txt`, runs the Streamlit command on `$PORT` and sets
-`PYTHON_VERSION=3.12.5` for you. The service URL appears when the build finishes
-(3–6 minutes).
+**Streamlit Community Cloud** is the easiest free option (no card, 1 GB RAM):
+<https://share.streamlit.io> → **Create app** → repo
+`tpsreekar37-dotcom/churn-prediction-system-v2`, branch `main`, main file
+`dashboard/app.py`, Python **3.12**. It installs `requirements.txt` and gives you
+a `*.streamlit.app` URL.
 
-Free plan caveats: 512 MB RAM, and it sleeps after 15 minutes idle (first visit
-takes 30–60 s to wake). The *Model Comparison & Evaluation* page trains five
-models on upload and is the one page that can hit the memory ceiling — see §6 of
-`DEPLOY.md`.
-
-### Railway (alternative)
-
-**New Project → Deploy from GitHub repo →** pick the repo. Railway uses the
-`Procfile`; generate a domain under **Settings → Networking**.
+**Render** works too and uses the included `render.yaml`:
+**New + → Blueprint →** pick the repo → **Apply**. Render sets the Python
+version, build command, start command and health check for you (free plan:
+512 MB, sleeps after 15 min).
 
 ### Notes
 
